@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from github import Github
 from main.models import Repo, Contributor
+from django.conf import settings
 
 
 class Command(BaseCommand):
@@ -12,7 +13,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         print("Getting contributors of "+str(options['repo_name'])+"...")
 
-        g = Github("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")
+        g = Github(settings.ACCESS_TOKEN)
         print("Connected to github API successfully")
 
         repo = g.get_repo(options['repo_name'])
