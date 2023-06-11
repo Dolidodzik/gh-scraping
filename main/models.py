@@ -23,6 +23,7 @@ class Contributor(models.Model):
     github_login = models.CharField(max_length = 39, unique=True)
     github_created_at = models.CharField(max_length = 100, unique=True)
 
+    name = models.CharField(max_length = 500, blank=True, null=True)
     email = models.EmailField(max_length = 254, blank=True, null=True)
     followers_count = models.IntegerField(blank=True, null=True)
     hireable = models.BooleanField(blank=True, null=True)

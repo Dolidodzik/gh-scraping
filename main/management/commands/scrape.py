@@ -33,12 +33,13 @@ class Command(BaseCommand):
             db_repo = Repo(name = options['repo_name'], forks_count = repo.forks, language = repo.language, url = repo.html_url)
             db_repo.save()
 
-        print("Reading contributors and saving them into db...")
+        print("Reading contributors...")
         contributors = repo.get_contributors()
-        
-        count = 0
+        print("There are " + str(contributors.totalCount) + " contributors in total in this repo")
+        print("Reading and saving them into db...")
+        iteration_count = 0
         for contributor in contributors:
-            count += 1
+            iteration_count += 1
             # checking if contributor already exists in db
             if Contributor.objects.filter(github_login = contributor.login).exists():
                 db_contributor = Contributor.objects.get(github_login = contributor.login)
@@ -52,6 +53,8 @@ class Command(BaseCommand):
                 db_contributor.bio = contributor.bio
                 db_contributor.company = contributor.company
                 db_contributor.location = contributor.location
+                db_contributor.name = contributor.name
+
                 db_contributor.save()
             else:
                 db_contributor = Contributor(
@@ -65,6 +68,7 @@ class Command(BaseCommand):
                     bio = contributor.bio,
                     company = contributor.company,
                     location = contributor.location,
+                    name = contributor.name,
                     github_created_at = contributor.created_at
                 )
                 db_contributor.save()
@@ -72,9 +76,9 @@ class Command(BaseCommand):
                 # adding newly created user to given repo
                 db_contributor.repos.add(Repo.objects.get(name = options['repo_name']))
 
-            if count % 100 == 0:
-                print("Already "+ str(count) +" contributors processed!")
+            if iteration_count % 10 == 0:
+                print("Already "+ str(iteration_count) +" contributors processed!")
         
         
-        print("Done. "+ str(count) + " contributors were found in this repo.")
+        print("Done. "+ str(iteration_count) + " contributors were found in this repo.")
     
