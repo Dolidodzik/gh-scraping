@@ -84,12 +84,11 @@ class Command(BaseCommand):
             # .patch emails thing
             if options['scan_dot_patch_files']:
                 commits = repo.get_commits(author=contributor)
-                if commits.totalCount <= 0:
-                    break
-                response = requests.get(commits[0].url).json()
-                email_from_patch = response['commit']['author']['email']
-                db_contributor.email_from_patch = email_from_patch
-                db_contributor.save()
+                if commits.totalCount > 0:
+                    author = commits[0].commit.author
+                    db_contributor.email_from_patch = author.email
+                    db_contributor.save()
+
 
             if iteration_count % 10 == 0:
                 print("Already "+ str(iteration_count) +" contributors processed!")
