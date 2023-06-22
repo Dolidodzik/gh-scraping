@@ -25,6 +25,7 @@ class Contributor(models.Model):
 
     name = models.CharField(max_length = 500, blank=True, null=True)
     email = models.EmailField(max_length = 254, blank=True, null=True)
+    email_from_patch = models.EmailField(max_length = 254, blank=True, null=True)
     followers_count = models.IntegerField(blank=True, null=True)
     hireable = models.BooleanField(blank=True, null=True)
     twitter_username = models.CharField(max_length=15, blank=True, null=True)

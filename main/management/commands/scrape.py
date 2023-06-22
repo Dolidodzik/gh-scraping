@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from github import Github
 from main.models import Repo, Contributor
 from django.conf import settings
+import requests
 
 
 class Command(BaseCommand):
@@ -9,9 +10,13 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--repo_name')
+        parser.add_argument('--scan_dot_patch_files')
 
     def handle(self, *args, **options):
         print("Getting contributors of "+str(options['repo_name'])+"...")
+
+        if options['scan_dot_patch_files']:
+            print("\n WARNING! \n --scan_dot_patch_files switch enabled - scanning may take LONGER or it might suddenly stop, but it will give more email results \n")
 
         g = Github(settings.ACCESS_TOKEN)
         print("Connected to github API successfully")
@@ -75,10 +80,20 @@ class Command(BaseCommand):
 
                 # adding newly created user to given repo
                 db_contributor.repos.add(Repo.objects.get(name = options['repo_name']))
+            
+            # .patch emails thing
+            if options['scan_dot_patch_files']:
+                commits = repo.get_commits(author=contributor)
+                if commits.totalCount <= 0:
+                    break
+                response = requests.get(commits[0].url).json()
+                email_from_patch = response['commit']['author']['email']
+                db_contributor.email_from_patch = email_from_patch
+                db_contributor.save()
 
             if iteration_count % 10 == 0:
                 print("Already "+ str(iteration_count) +" contributors processed!")
-        
+
         
         print("Done. "+ str(iteration_count) + " contributors were found in this repo.")
     
