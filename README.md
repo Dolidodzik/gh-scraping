@@ -30,4 +30,11 @@ Now to actually get data you need, just use this command (you can replace facebo
 ```
 sudo docker-compose exec web python manage.py scrape --repo_name facebook/react
 ```
+
+If you want to also scrape emails from commit data, use `--scan_dot_patch_files 1` switch:
+```
+sudo docker-compose exec web python manage.py scrape --repo_name facebook/react --scan_dot_patch_files 1
+```
+
+
 Reading this data and saving it into db can take few up to a few minutes, but it will be there eventually. To check results, go to localhost:8000/admin, and view Contributors and Repos.
